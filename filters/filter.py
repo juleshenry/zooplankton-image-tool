@@ -1,8 +1,14 @@
 def contrast():
-	pass
+    pass
+
+
 def posterize():
-	pass
+    pass
+
+
 def hue():
-	pass
+    pass
+
+
 def blackpoint():
-	pass
+    pass
