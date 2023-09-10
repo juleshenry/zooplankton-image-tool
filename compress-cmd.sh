@@ -1,0 +1,1 @@
+ ffmpeg -i in.MP4 -b:v 1000k -c:a aac -b:a 128k out.mp4
