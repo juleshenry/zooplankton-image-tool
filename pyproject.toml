@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "Computer Vision Box"
+version = "0.1.0"
+description = "ZIT, the premier zooplankton imaging tool"
+authors = ["Julián Henry"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Pillow = "^9.0.0"
+opencv-python = "^4.5.1"
+opencv-python-headless = "^4.8.1.78"
+
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=1.0.0"]
+build-backend = "poetry.masonry.api"
