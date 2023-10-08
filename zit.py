@@ -96,7 +96,7 @@ class Zit:
                 bg_pixel = background_data[x, y][:3]
                 overlay_pixel = overlay_data[x, y][:3]
                 # Compare RGB values
-                if dist.euclidean(bg_pixel,overlay_pixel) < 100:
+                if dist.euclidean(bg_pixel,overlay_pixel) < 50:
                     # If pixels are different, replace background pixel with overlay pixel
                     background_data[x, y] = (*overlay_pixel, 255)
 
@@ -110,11 +110,14 @@ if __name__=='__main__':
     output_folder = 'red_bud_simple'
     interval_seconds = 5
     z = Zit(input_video, output_folder, interval_seconds)
-    # Paths to your images
-    bbb = z.pathjoin('frame_0.jpg')
-    ooo = z.pathjoin('frame_115.jpg')
-    out = 'zz.png'
-    # z.replace_different_pixels(bbb,ooo,out)
+    out_initial = 'composite.png'
     frames = sorted(os.listdir(z.output_folder))
+    init_b, init_o = frames[:2]
+    init_b, init_o = z.pathjoin(init_b), z.pathjoin(init_o)
+    out_name = ""
     for i, f in enumerate(frames[:-1]):
-        print(f, frames[i+1])
+        if i:
+            f = z.pathjoin(f)
+            out_name = z.replace_different_pixels(f,out_name,out_name)
+        else:
+            out_name = z.replace_different_pixels(init_b,init_o,out_initial)
