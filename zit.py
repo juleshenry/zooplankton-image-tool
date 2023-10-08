@@ -1,6 +1,8 @@
 import cv2
 import os
 import numpy as np
+from scipy.spatial import distance as dist
+from PIL import Image
 
 class Zit:
 
@@ -54,6 +56,7 @@ class Zit:
         cv2.imwrite(self.pathjoin('x.jpg'), blended)
 
     def composify(self, a,b,debug=False):
+
         a = self.pathjoin(a)
         b = self.pathjoin(b)
         foreground = cv2.imread(b)
@@ -74,25 +77,44 @@ class Zit:
         # Save the result
         cv2.imwrite(out:=self.pathjoin('composite.png'), composite)
         return out
+
+    def replace_different_pixels(self, bgp, olp, output_path):
+        # Open the background and overlay images
+        background = Image.open(bgp)
+        overlay = Image.open(olp)
+
+        # Ensure that overlay has the same size as background
+        overlay = overlay.resize(background.size)
+
+        # Get pixel data
+        background_data = background.load()
+        overlay_data = overlay.load()
+
+        # Iterate over each pixel
+        for x in range(background.width):
+            for y in range(background.height):
+                bg_pixel = background_data[x, y][:3]
+                overlay_pixel = overlay_data[x, y][:3]
+                # Compare RGB values
+                if dist.euclidean(bg_pixel,overlay_pixel) < 100:
+                    # If pixels are different, replace background pixel with overlay pixel
+                    background_data[x, y] = (*overlay_pixel, 255)
+
+        # Save the result
+        background.save(output_path, 'PNG')
+        return output_path
+
 # Usage example
 if __name__=='__main__':
     input_video = './samples/flowe.mp4'
     output_folder = 'red_bud_simple'
     interval_seconds = 5
     z = Zit(input_video, output_folder, interval_seconds)
-
-    outlist = sorted(os.listdir(z.output_folder))
-    out = ""
-    for i, a in enumerate(outlist[:-1]):
-        if a[0]!='f':
-            continue
-        if not i:
-            out = z.composify(a, outlist[i+1])
-        else:
-            z.composify(a, out)
-
-
-    z.composify('frame_0.jpg','frame_115.jpg')
-    # z.multiply_concat('frame_0.jpg','frame_115.jpg')
-    # z.multiply_concat('frame_115.jpg','x.jpg')
-    # z.capture_frames()
+    # Paths to your images
+    bbb = z.pathjoin('frame_0.jpg')
+    ooo = z.pathjoin('frame_115.jpg')
+    out = 'zz.png'
+    # z.replace_different_pixels(bbb,ooo,out)
+    frames = sorted(os.listdir(z.output_folder))
+    for i, f in enumerate(frames[:-1]):
+        print(f, frames[i+1])
