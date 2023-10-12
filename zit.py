@@ -158,7 +158,7 @@ class Zit:
 # Usage example
 if __name__ == "__main__":
     # Convert video into frames
-    input_video = "./samples/energetic_swimmer.mp4"
+    input_video = "./samples/mariposa.mp4"
     output_folder = "frames/basic"
     interval_seconds = 1
     z = Zit(
@@ -169,4 +169,4 @@ if __name__ == "__main__":
         noise_delta=50, #de jour, ymmv
     )
     z.capture_frames()
-    z.composite_from_frames(f"composited.png", skip=(0,960,))
+    z.composite_from_frames(f"mari_composited.png", skip=(0,960,))
