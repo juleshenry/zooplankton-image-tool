@@ -161,12 +161,13 @@ if __name__ == "__main__":
     input_video = "./samples/energetic_swimmer.mp4"
     output_folder = "frames/basic"
     interval_seconds = 1
-    z = Zit(
-        input_video,
-        output_folder,
-        interval_seconds,
-        composite_epsilon=100,
-        noise_delta=80,
-    )
-    # z.capture_frames()
-    z.composite_from_frames("compositez.png")  # , skip=(0,960,))
+    for i,j in zip(range(10),range(10)):
+        z = Zit(
+            input_video,
+            output_folder,
+            interval_seconds,
+            composite_epsilon=100,
+            noise_delta=20,
+        )
+        # z.capture_frames()
+        z.composite_from_frames(f"compositez_{i}_{j}.png")  # , skip=(0,960,))
