@@ -2,14 +2,17 @@
 
 Makes plankton photos look real good. 
 
+
+CLI: 
+```
+python3 zit.py 
+```
+
 ![Plankton Example](composited.png)
 
-CLI:
-```
-python3 zit.py
-```
+![Lovely Example](plankt_oct19.png)
 
-![Lovely Example](mari_comp.png)
+![Lovely Example](plankt_oct06.png)
 
 # Documentation
 
