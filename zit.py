@@ -163,7 +163,7 @@ if __name__ == "__main__":
 
     # print(p[0])
     # Convert video into frames
-    input_video = "./samples/plankt_oct19.mp4"
+    input_video = "./samples/plankt_oct06.mp4"
     output_folder = "frames/basic"
     interval_seconds = 1
     z = Zit(

@@ -1,0 +1,11 @@
+#BUG:
+"""
+Putting frames/basic/frame_1020.jpg onto frames/basic/frame_0.jpg
+Putting frames/basic/frame_1080.jpg onto plankt_oct19
+Putting frames/basic/frame_1140.jpg onto plankt_oct19
+Putting frames/basic/frame_120.jpg onto plankt_oct19
+Putting frames/basic/frame_1200.jpg onto plankt_oct19
+Putting frames/basic/frame_1260.jpg onto plankt_oct19
+Putting frames/basic/frame_1320.jpg onto plankt_oct19
+"""
+# Should be frame_20.jpg onto frame_0.jpg... etc
