@@ -163,7 +163,7 @@ if __name__ == "__main__":
 
     # print(p[0])
     # Convert video into frames
-    input_video = "./samples/plankt_oct06.mp4"
+    input_video = "./samples/limo.mp4"
     output_folder = "frames/basic"
     interval_seconds = 1
     z = Zit(
@@ -174,4 +174,4 @@ if __name__ == "__main__":
         noise_delta=50, #de jour, ymmv
     )
     z.capture_frames()
-    z.composite_from_frames(f"{input_video.split('/')[2].split('.')[0]}") #, skip=(0,960,))
+    z.composite_from_frames(f"{input_video.split('/')[2].split('.')[0]}", skip=(700,900,))
