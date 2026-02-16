@@ -1,4 +1,4 @@
-"""
+r"""
                                              ▁▁▅▆▆▆▅▁▁                                              
                                             ▂▅▅ ▃▃▃▂▅▅▃                                             
                                             ▄▆ ▅███▆▁▅▇                                             
@@ -140,9 +140,9 @@ def main():
     print(f"Updating pyproject.toml to v{new_version}...")
     update_file("pyproject.toml", r'version = ".*"', f'version = "{new_version}"')
 
-    print(f"Updating src/superwand/__init__.py to v{new_version}...")
+    print(f"Updating src/zit/__init__.py to v{new_version}...")
     update_file(
-        "src/superwand/__init__.py",
+        "src/zit/__init__.py",
         r'__version__ = ".*"',
         f'__version__ = "{new_version}"',
     )
@@ -155,8 +155,8 @@ def main():
     print("Cleaning old builds...")
     if os.path.exists("dist"):
         run_command("rm -rf dist/*")
-    if os.path.exists("src/superwand.egg-info"):
-        run_command("rm -rf src/superwand.egg-info")
+    if os.path.exists("src/zit.egg-info"):
+        run_command("rm -rf src/zit.egg-info")
 
     print("Building package...")
     run_command(
@@ -166,7 +166,7 @@ def main():
     # 4. Git Operations
     print("Committing and tagging in git...")
     tag_version = new_version if new_version.startswith("v") else f"v{new_version}"
-    run_command(f"git add pyproject.toml src/superwand/__init__.py CHANGELOG.md")
+    run_command(f"git add pyproject.toml src/zit/__init__.py CHANGELOG.md")
     # Check if there are changes to commit
     status = subprocess.run("git diff --cached --quiet", shell=True).returncode
     if status != 0:
