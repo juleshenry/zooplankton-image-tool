@@ -1,7 +1,6 @@
 import cv2
 import os
 import numpy as np
-from scipy.spatial import distance as dist
 from PIL import Image
 from typing import Optional, Tuple
 
@@ -82,39 +81,36 @@ class Zit:
         cv2.imwrite(self.pathjoin("x.jpg"), blended)
 
     @staticmethod
-    def get_avg_pix(img: Image.Image, img_data) -> Tuple[float, float, float]:
-        avg = [0.0, 0.0, 0.0]
-        for x in range(img.width):
-            for y in range(img.height):
-                pix = img_data[x, y][:3]
-                avg[0] += pix[0]
-                avg[1] += pix[1]
-                avg[2] += pix[2]
-        total_pixels = img.width * img.height
-        return (avg[0] / total_pixels, avg[1] / total_pixels, avg[2] / total_pixels)
+    def get_avg_pix(img: Image.Image) -> Tuple[float, float, float]:
+        img_arr = np.array(img.convert("RGB"))
+        avg = np.mean(img_arr, axis=(0, 1))
+        return tuple(avg)
 
     def replace_different_pixels(self, bgp: str, olp: str, output_path: str) -> str:
         print("Putting", olp, "onto", bgp)
         background = Image.open(bgp).convert("RGB")
         overlay = Image.open(olp).resize(background.size).convert("RGB")
 
-        background_data = background.load()
-        overlay_data = overlay.load()
-        avg_pixel = self.get_avg_pix(overlay, overlay_data)
+        bg_arr = np.array(background)
+        ol_arr = np.array(overlay)
 
-        for x in range(background.width):
-            for y in range(background.height):
-                bg_pixel = background_data[x, y]
-                overlay_pixel = overlay_data[x, y]
+        avg_pixel = np.mean(ol_arr, axis=(0, 1))
 
-                if dist.euclidean(overlay_pixel, avg_pixel) < self.noise_delta:
-                    continue
-                
-                dif = dist.euclidean(bg_pixel, overlay_pixel)
-                if dif > self.composite_epsilon:
-                    background_data[x, y] = overlay_pixel
+        # Vectorized Euclidean distance calculation
+        # Distance between overlay pixels and the average color
+        dist_to_avg = np.linalg.norm(ol_arr.astype(float) - avg_pixel, axis=2)
         
-        background.save(output_path, "PNG")
+        # Distance between background and overlay pixels
+        dist_bg_ol = np.linalg.norm(bg_arr.astype(float) - ol_arr.astype(float), axis=2)
+
+        # Apply mask: (overlay not noise) AND (difference > epsilon)
+        mask = (dist_to_avg >= self.noise_delta) & (dist_bg_ol > self.composite_epsilon)
+        
+        # Update background where mask is True
+        bg_arr[mask] = ol_arr[mask]
+
+        result = Image.fromarray(bg_arr)
+        result.save(output_path, "PNG")
         return output_path
 
     @staticmethod

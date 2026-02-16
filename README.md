@@ -1,5 +1,7 @@
 # ZIT (Zooplankton Image Tool)
 
+![Marine Example](assets/mari_comp.png)
+
 Makes plankton photos look real good. 
 
 
@@ -18,15 +20,28 @@ zit --input samples/limo.mp4 --composite
 poetry install
 ```
 
-![Plankton Example](composited.png)
+## Plankton Grid
 
-![Lovely Example](plankt_oct19.jpg)
+### 184368 Comparison
+| Eps 5 | Eps 10 | Eps 15 | Eps 25 | Eps 50 |
+| :---: | :---: | :---: | :---: | :---: |
+| ![Eps 5](assets/184368_eps5.png) | ![Eps 10](assets/184368_eps10.png) | ![Eps 15](assets/184368_eps15.png) | ![Eps 25](assets/184368_eps25.png) | ![Eps 50](assets/184368_eps50.png) |
 
-![Lovely Example](plankt_oct06.jpg)
+### 230717 Comparison
+| Eps 5 | Eps 10 | Eps 15 | Eps 25 | Eps 50 |
+| :---: | :---: | :---: | :---: | :---: |
+| ![Eps 5](assets/230717_eps5.png) | ![Eps 10](assets/230717_eps10.png) | ![Eps 15](assets/230717_eps15.png) | ![Eps 25](assets/230717_eps25.png) | ![Eps 50](assets/230717_eps50.png) |
 
-![Marine Example](mari_comp.png)
+### 307555 Comparison
+| Eps 5 | Eps 10 | Eps 15 | Eps 25 | Eps 50 |
+| :---: | :---: | :---: | :---: | :---: |
+| ![Eps 5](assets/307555_eps5.png) | ![Eps 10](assets/307555_eps10.png) | ![Eps 15](assets/307555_eps15.png) | ![Eps 25](assets/307555_eps25.png) | ![Eps 50](assets/307555_eps50.png) |
 
-![Line Example](li.png)
+![Plankton Example](assets/composited.png)
+![Lovely Example](assets/plankt_oct19.jpg)
+![Lovely Example](assets/plankt_oct06.jpg)
+![Line Example](assets/li.png)
+![HMM](assets/hmm.jpg)
 
 # Documentation
 

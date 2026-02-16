@@ -1,4 +1,5 @@
 from PIL import Image, ImageEnhance, ImageOps
+import numpy as np
 
 def contrast(image, factor):
     """
@@ -35,25 +36,14 @@ def hue(image, factor):
     Parameters:
         image (PIL.Image): The input image.
         factor (float): A factor by which to adjust the hue. 
-                       0.0 means no change, 1.0 means 360 degrees shift.
+                       1.0 means no change.
 
     Returns:
         PIL.Image: The modified image.
     """
-    # Convert the image to HSV mode
-    hsv_image = image.convert('HSV')
-    
-    # Separate H, S, and V channels
-    h, s, v = hsv_image.split()
-    
-    # Apply hue adjustment
-    h = h.point(lambda p: p * factor)
-    
-    # Merge the modified channels back into an HSV image
-    modified_hsv_image = Image.merge('HSV', (h, s, v))
-    
-    # Convert back to RGB mode
-    return modified_hsv_image.convert('RGB')
+    hsv_arr = np.array(image.convert('HSV'))
+    hsv_arr[..., 0] = np.clip(hsv_arr[..., 0].astype(float) * factor, 0, 255).astype(np.uint8)
+    return Image.fromarray(hsv_arr, 'HSV').convert('RGB')
 
 def blackpoint(image, threshold):
     """
@@ -66,4 +56,6 @@ def blackpoint(image, threshold):
     Returns:
         PIL.Image: The modified image.
     """
-    return image.point(lambda p: 0 if p < threshold else p)
+    img_arr = np.array(image)
+    img_arr[img_arr < threshold] = 0
+    return Image.fromarray(img_arr)
