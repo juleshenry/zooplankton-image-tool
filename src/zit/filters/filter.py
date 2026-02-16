@@ -67,26 +67,3 @@ def blackpoint(image, threshold):
         PIL.Image: The modified image.
     """
     return image.point(lambda p: 0 if p < threshold else p)
-
-# Example usage:
-
-# Load an image
-input_image = Image.open('input_image.jpg')
-
-# Adjust contrast
-output_image_contrast = contrast(input_image, 1.5)
-
-# Posterize
-output_image_posterize = posterize(input_image, 5)
-
-# Adjust hue
-output_image_hue = hue(input_image, 0.5)
-
-# Set black point
-output_image_blackpoint = blackpoint(input_image, 100)
-
-# Save the modified images
-output_image_contrast.save('output_contrast.jpg')
-output_image_posterize.save('output_posterize.jpg')
-output_image_hue.save('output_hue.jpg')
-output_image_blackpoint.save('output_blackpoint.jpg')

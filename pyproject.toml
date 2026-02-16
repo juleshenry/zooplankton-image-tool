@@ -1,17 +1,24 @@
 [tool.poetry]
-name = "Computer Vision Box"
+name = "zooplankton-image-tool"
 version = "0.1.0"
 description = "ZIT, the premier zooplankton imaging tool"
 authors = ["Julián Henry"]
+readme = "README.md"
+packages = [{include = "zit", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 Pillow = "^9.0.0"
 opencv-python = "^4.5.1"
 opencv-python-headless = "^4.8.1.78"
+scipy = "^1.10.0"
+numpy = "^1.24.0"
 
+[tool.poetry.scripts]
+zit = "zit.cli:main"
 
 [tool.poetry.dev-dependencies]
+pytest = "^7.0.0"
 
 [build-system]
 requires = ["poetry>=1.0.0"]

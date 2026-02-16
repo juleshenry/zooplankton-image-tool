@@ -4,8 +4,18 @@ Makes plankton photos look real good.
 
 
 CLI: 
+```bash
+# Using poetry
+poetry run zit --input samples/limo.mp4 --composite
+
+# If installed
+zit --input samples/limo.mp4 --composite
 ```
-python3 zit.py 
+
+## Installation
+
+```bash
+poetry install
 ```
 
 ![Plankton Example](composited.png)
@@ -13,6 +23,10 @@ python3 zit.py
 ![Lovely Example](plankt_oct19.jpg)
 
 ![Lovely Example](plankt_oct06.jpg)
+
+![Marine Example](mari_comp.png)
+
+![Line Example](li.png)
 
 # Documentation
 
