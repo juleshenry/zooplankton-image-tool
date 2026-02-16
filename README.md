@@ -1,56 +1,76 @@
 # ZIT (Zooplankton Image Tool)
 
-![Marine Example](assets/mari_comp.png)
+ZIT is a tool designed to enhance and composite plankton photos from video frames. It uses computer vision techniques (OpenCV MOG2 background subtraction and contour filtering) to create clean, high-quality composites showing the locomotion of zooplankton.
 
-Makes plankton photos look real good. 
+![Mariposa Example](assets/mari_comp.png)
 
-
-CLI: 
-```bash
-# Using poetry
-poetry run zit --input samples/limo.mp4 --composite
-
-# If installed
-zit --input samples/limo.mp4 --composite
-```
+## Features
+- **Frame Capture:** Extract frames from videos at specified intervals.
+- **Motion-Based Composition:** Create composites by overlaying moving entities on a stable background.
+- **Entity Recognition:** Uses MOG2 background subtraction to isolate animals from noise and artifacts.
+- **Parameter Sweeping:** Find optimal threshold values for different video conditions.
 
 ## Installation
+Ensure you have [Poetry](https://python-poetry.org/) installed.
 
 ```bash
 poetry install
 ```
 
-## Plankton Grid
+## Usage
 
-### 184368 Comparison
-| Eps 5 | Eps 10 | Eps 15 | Eps 25 | Eps 50 |
-| :---: | :---: | :---: | :---: | :---: |
-| ![Eps 5](assets/184368_eps5.png) | ![Eps 10](assets/184368_eps10.png) | ![Eps 15](assets/184368_eps15.png) | ![Eps 25](assets/184368_eps25.png) | ![Eps 50](assets/184368_eps50.png) |
+### CLI
+Capture frames and create a composite in one command:
 
-### 230717 Comparison
-| Eps 5 | Eps 10 | Eps 15 | Eps 25 | Eps 50 |
-| :---: | :---: | :---: | :---: | :---: |
-| ![Eps 5](assets/230717_eps5.png) | ![Eps 10](assets/230717_eps10.png) | ![Eps 15](assets/230717_eps15.png) | ![Eps 25](assets/230717_eps25.png) | ![Eps 50](assets/230717_eps50.png) |
+```bash
+# Using poetry
+poetry run zit --input samples/limo.mp4 --composite --entities
 
-### 307555 Comparison
-| Eps 5 | Eps 10 | Eps 15 | Eps 25 | Eps 50 |
-| :---: | :---: | :---: | :---: | :---: |
-| ![Eps 5](assets/307555_eps5.png) | ![Eps 10](assets/307555_eps10.png) | ![Eps 15](assets/307555_eps15.png) | ![Eps 25](assets/307555_eps25.png) | ![Eps 50](assets/307555_eps50.png) |
+# If installed
+zit --input samples/limo.mp4 --composite --entities
+```
 
-![Plankton Example](assets/composited.png)
-![Lovely Example](assets/plankt_oct19.jpg)
-![Lovely Example](assets/plankt_oct06.jpg)
-![Line Example](assets/li.png)
-![HMM](assets/hmm.jpg)
+### Parameters
+- `--input`, `-i`: Path to the input video.
+- `--interval`: Interval in seconds for frame capture (default: `1`).
+- `--composite`: Enable composition after frame capture.
+- `--entities`: Use entity recognition for cleaner composites (recommended).
+- `--epsilon`: Difference threshold for entity detection (default: `20.0`). Also referred to as `Thresh` in sweep grids.
+- `--noise`: Minimum pixel area for a detected entity (default: `50.0`). Also referred to as `MinArea` in sweep grids.
+- `--skip START END`: Process only a specific frame range.
+- `--out-file`: Name of the output composite image (default: `composited.png`).
 
-# Documentation
+### Parameter Sweep
+To find the optimal threshold values for your video, use the parameter sweep script. It generates a 5x5 grid of composites sweeping across `MinArea` (noise) and `Thresh` (epsilon).
 
-You will find the `composite_from_frames` method useful for creating composites of plankton locomotion.
+```bash
+python sweep_grid.py
+```
 
-***skip*** allows for selection of specific frames window
+## Gallery
 
-***interval*** deteermines the cadence of video screen captures, in seconds
+### Parameter Grids
+Find the optimal thresholds for different conditions. These grids show variations in `MinArea` and `Thresh`.
 
-***noise_delta*** is based on the average pixel of the overlay. If the overlayed pixel is itself noise, do not overlay it
+| Video 184368 Sweep | Video 230717 Sweep | Video 307555 Sweep |
+| :---: | :---: | :---: |
+| <img src="assets/sweep_grid_184368-873181589_small.mp4.png" width="250"> | <img src="assets/sweep_grid_230717_small.mp4.png" width="250"> | <img src="assets/sweep_grid_307555_tiny.mp4.png" width="250"> |
 
-***composite_epsilon*** is the difference between overlay and background threshold required to perform the overlay in composition
+### Entity Recognition Results
+Clean composites generated using OpenCV MOG2 and contour filtering.
+
+| Video 184368 | Video 230717 | Video 307555 |
+| :---: | :---: | :---: |
+| <img src="assets/184368_entities.png" width="250"> | <img src="assets/230717_entities.png" width="250"> | <img src="assets/307555_entities.png" width="250"> |
+
+### Examples
+![Plankton Example](assets/plankt_oct15.png)
+![Lovely Example 1](assets/plankt_oct19.jpg)
+![Lovely Example 2](assets/plankt_oct06.jpg)
+
+## Cleanup
+To remove temporary files and generated frames:
+
+```bash
+rm -rf temp_sweep_* frames/
+```

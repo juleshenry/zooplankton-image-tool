@@ -10,6 +10,7 @@ def main():
     parser.add_argument("--epsilon", type=float, default=20.0, help="Composite epsilon")
     parser.add_argument("--noise", type=float, default=50.0, help="Noise delta")
     parser.add_argument("--composite", action="store_true", help="Perform composition after capture")
+    parser.add_argument("--entities", action="store_true", help="Use entity recognition for composition")
     parser.add_argument("--out-file", type=str, default="composited.png", help="Output file name for composition")
     parser.add_argument("--skip", type=int, nargs=2, metavar=("START", "END"), help="Start and end frames to skip to")
 
@@ -33,7 +34,7 @@ def main():
     if args.composite:
         print(f"Creating composite: {args.out_file}...")
         skip_tuple = tuple(args.skip) if args.skip else None
-        z.composite_from_frames(args.out_file, skip=skip_tuple)
+        z.composite_from_frames(args.out_file, skip=skip_tuple, use_entities=args.entities)
         print("Done.")
 
 if __name__ == "__main__":
