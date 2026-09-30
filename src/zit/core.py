@@ -52,13 +52,15 @@ import numpy as np
 from PIL import Image
 from typing import Optional, Tuple
 
+from .tracking import draw_trails, filter_tracks, link_detections, write_tracks_csv
+
 
 class Zit:
     def __init__(
         self,
         input_video: str,
         output_folder: str,
-        interval: int,
+        interval: float,
         composite_epsilon: float = 20.0,
         noise_delta: float = 50.0,
     ):
@@ -90,9 +92,11 @@ class Zit:
             print(f"Error: Could not open video {self.input_video}")
             return
 
-        frame_rate = int(cap.get(cv2.CAP_PROP_FPS))
-        if frame_rate == 0:
+        frame_rate = cap.get(cv2.CAP_PROP_FPS)
+        if not frame_rate or frame_rate <= 0:
             frame_rate = 30 # Default if unknown
+        # Sample every `step` frames; sub-second intervals are allowed down to every frame
+        step = max(1, round(frame_rate * self.interval))
 
         frame_number = 0
         os.makedirs(self.output_folder, exist_ok=True)
@@ -100,7 +104,7 @@ class Zit:
             ret, frame = cap.read()
             if not ret:
                 break
-            if frame_number % (frame_rate * self.interval) == 0:
+            if frame_number % step == 0:
                 frame_path = os.path.join(self.output_folder, f"frame_{frame_number}.jpg")
                 cv2.imwrite(frame_path, frame)
                 print(f"Saved frame {frame_number}")
@@ -184,8 +188,22 @@ class Zit:
         ]
 
     def composite_from_frames(
-        self, out_file: str, skip: Optional[Tuple[int, int]] = None, use_entities: bool = False
+        self,
+        out_file: str,
+        skip: Optional[Tuple[int, int]] = None,
+        use_entities: bool = False,
+        trails: bool = False,
+        tracks_csv: Optional[str] = None,
+        max_jump: float = 50.0,
+        min_track_points: int = 4,
+        min_straightness: float = 0.7,
+        track_merge: float = 0.0,
     ):
+        """
+        Composites the captured frames into `out_file`. With `use_entities`,
+        detected animals can also be linked into tracks: `trails` draws their
+        paths onto the composite and `tracks_csv` writes the per-frame positions.
+        """
         frames = sorted([f for f in os.listdir(self.output_folder) if f.startswith("frame_") and f.endswith(".jpg")], key=self.frame_match)
         if not frames:
             print("No frames found to composite.")
@@ -204,8 +222,13 @@ class Zit:
             return
 
         if use_entities:
-            self._entity_composite(frames, out_file)
+            self._entity_composite(
+                frames, out_file, trails, tracks_csv, max_jump, min_track_points, min_straightness,
+                track_merge,
+            )
             return
+        if trails or tracks_csv:
+            print("Tracking requires entity recognition (--entities); skipping trails/tracks.")
 
         bg_img = Image.open(self.pathjoin(frames[0])).convert("RGB")
         bg_arr = np.array(bg_img)
@@ -218,16 +241,40 @@ class Zit:
         result = Image.fromarray(bg_arr)
         result.save(out_file, "PNG")
 
-    def _entity_composite(self, frames, out_file):
+    @staticmethod
+    def _merged_detections(frame_mask: np.ndarray, merge: float, min_frac: float = 0.005):
+        """
+        Fuses nearby foreground fragments into whole-animal blobs for tracking.
+        Large animals (birds, mammals) break into many pieces under MOG2; closing
+        with a kernel `merge` * the frame's short side rejoins them. Blobs under
+        `min_frac` of the frame are dropped as leftover speckle.
+        """
+        ks = max(3, int(min(frame_mask.shape) * merge)) | 1
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (ks, ks))
+        merged = cv2.morphologyEx(frame_mask, cv2.MORPH_CLOSE, kernel)
+        n, _, stats, centroids = cv2.connectedComponentsWithStats(merged)
+        min_area = frame_mask.size * min_frac
+        return [
+            (float(centroids[i][0]), float(centroids[i][1]), float(stats[i, cv2.CC_STAT_AREA]))
+            for i in range(1, n)
+            if stats[i, cv2.CC_STAT_AREA] >= min_area
+        ]
+
+    def _entity_composite(
+        self, frames, out_file, trails=False, tracks_csv=None, max_jump=50.0,
+        min_track_points=4, min_straightness=0.7, track_merge=0.0,
+    ):
         # Use MOG2 background subtractor for better motion detection and ghosting prevention
         backSub = cv2.createBackgroundSubtractorMOG2(history=len(frames), varThreshold=self.composite_epsilon, detectShadows=True)
         
         # Training pass: identify background and motion
         images = []
+        frame_numbers = []
         for frame_name in frames:
             img = cv2.imread(self.pathjoin(frame_name))
             if img is not None:
                 images.append(img)
+                frame_numbers.append(self.frame_match(frame_name))
                 backSub.apply(img)
         
         if not images:
@@ -240,6 +287,7 @@ class Zit:
             background = np.median(np.stack(images[:min(len(images), 50)]), axis=0).astype(np.uint8)
             
         result_arr = background.copy()
+        detections = []
         
         # Persistence mask to filter out static objects that MOG2 might still flag
         # We only want "proper animals in motion"
@@ -261,6 +309,7 @@ class Zit:
             contours, _ = cv2.findContours(fgMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
             frame_mask = np.zeros_like(fgMask)
+            frame_dets = []
             for cnt in contours:
                 area = cv2.contourArea(cnt)
                 if area > self.noise_delta:
@@ -270,8 +319,26 @@ class Zit:
                     # Proper animals are usually somewhat contained, not 100x longer than wide
                     if 0.05 < aspect_ratio < 20:
                         cv2.drawContours(frame_mask, [cnt], -1, 255, -1)
+                        m = cv2.moments(cnt)
+                        if m["m00"] > 0:
+                            frame_dets.append((m["m10"] / m["m00"], m["m01"] / m["m00"], area))
+                        else:
+                            frame_dets.append((x + w / 2, y + h / 2, area))
+            if track_merge > 0:
+                frame_dets = self._merged_detections(frame_mask, track_merge)
+            detections.append(frame_dets)
             
             # Temporal order: newer entities overwrite older ones at the same location
             result_arr[frame_mask == 255] = img[frame_mask == 255]
-            
+
+        if trails or tracks_csv:
+            tracks = link_detections(frame_numbers, detections, max_jump=max_jump)
+            tracks = filter_tracks(tracks, min_track_points, min_straightness)
+            print(f"Tracked {len(tracks)} swimming entities across {len(images)} frames.")
+            if trails:
+                result_arr = draw_trails(result_arr, tracks)
+            if tracks_csv:
+                write_tracks_csv(tracks_csv, tracks)
+                print(f"Wrote tracks to {tracks_csv}")
+
         cv2.imwrite(out_file, result_arr)

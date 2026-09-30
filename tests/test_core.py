@@ -74,6 +74,23 @@ def test_capture_frames(tmp_path):
     ]
 
 
+def test_capture_frames_fractional_interval(tmp_path):
+    video_path = str(tmp_path / "clip.avi")
+    writer = cv2.VideoWriter(
+        video_path, cv2.VideoWriter_fourcc(*"MJPG"), 10, (32, 32)
+    )
+    for _ in range(12):
+        writer.write(np.full((32, 32, 3), 128, dtype=np.uint8))
+    writer.release()
+
+    out = tmp_path / "frames"
+    Zit(input_video=video_path, output_folder=str(out), interval=0.25).capture_frames()
+
+    # 0.25s at 10fps rounds to every 2nd frame (the old int math would have
+    # sampled only frame 0, or crashed on modulo-by-zero for tiny intervals).
+    assert sorted(Zit.frame_match(p.name) for p in out.iterdir()) == [0, 2, 4, 6, 8, 10]
+
+
 def test_entity_composite_captures_moving_object(tmp_path):
     z = make_zit(tmp_path, composite_epsilon=16.0, noise_delta=20.0)
     frames = []
