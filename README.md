@@ -2,7 +2,7 @@
 
 ZIT is a tool designed to enhance and composite plankton photos from video frames. It uses computer vision techniques (OpenCV MOG2 background subtraction and contour filtering) to create clean, high-quality composites showing the locomotion of zooplankton.
 
-![Mariposa Example](assets/mari_comp.png)
+![Mariposa Example](https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/mari_comp.png)
 
 ## Features
 - **Frame Capture:** Extract frames from videos at specified intervals.
@@ -54,19 +54,19 @@ Find the optimal thresholds for different conditions. These grids show variation
 
 | Video 184368 Sweep | Video 230717 Sweep | Video 307555 Sweep |
 | :---: | :---: | :---: |
-| <img src="assets/sweep_grid_184368-873181589_small.mp4.png" width="250"> | <img src="assets/sweep_grid_230717_small.mp4.png" width="250"> | <img src="assets/sweep_grid_307555_tiny.mp4.png" width="250"> |
+| <img src="https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/sweep_grid_184368-873181589_small.mp4.png" width="250"> | <img src="https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/sweep_grid_230717_small.mp4.png" width="250"> | <img src="https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/sweep_grid_307555_tiny.mp4.png" width="250"> |
 
 ### Entity Recognition Results
 Clean composites generated using OpenCV MOG2 and contour filtering.
 
 | Video 184368 | Video 230717 | Video 307555 |
 | :---: | :---: | :---: |
-| <img src="assets/184368_entities.png" width="250"> | <img src="assets/230717_entities.png" width="250"> | <img src="assets/307555_entities.png" width="250"> |
+| <img src="https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/184368_entities.png" width="250"> | <img src="https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/230717_entities.png" width="250"> | <img src="https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/307555_entities.png" width="250"> |
 
 ### Examples
-![Plankton Example](assets/plankt_oct15.png)
-![Lovely Example 1](assets/plankt_oct19.jpg)
-![Lovely Example 2](assets/plankt_oct06.jpg)
+![Plankton Example](https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/plankt_oct15.png)
+![Lovely Example 1](https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/plankt_oct19.jpg)
+![Lovely Example 2](https://raw.githubusercontent.com/juleshenry/zooplankton-image-tool/main/assets/plankt_oct06.jpg)
 
 ## Cleanup
 To remove temporary files and generated frames:
