@@ -24,10 +24,10 @@ Capture frames and create a composite in one command:
 
 ```bash
 # Using poetry
-poetry run zit --input samples/limo.mp4 --composite --entities
+poetry run zit --input videos/230717_small.mp4 --composite --entities
 
 # If installed
-zit --input samples/limo.mp4 --composite --entities
+zit --input videos/230717_small.mp4 --composite --entities
 ```
 
 ### Parameters

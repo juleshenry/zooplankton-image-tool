@@ -71,11 +71,14 @@ class Zit:
     @staticmethod
     def clear_folder(folder_path: str):
         """
-        Clears all files from a folder.
+        Removes previously captured frame_<n>.jpg files from a folder,
+        leaving any other files untouched.
         """
         if not os.path.exists(folder_path):
             return
         for filename in os.listdir(folder_path):
+            if not (filename.startswith("frame_") and filename.endswith(".jpg")):
+                continue
             file_path = os.path.join(folder_path, filename)
             if os.path.isfile(file_path):
                 os.remove(file_path)
